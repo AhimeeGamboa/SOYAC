@@ -48,3 +48,20 @@ class SistemaOperativo:
                     proceso.estado = "Terminado"
                     print(f"Proceso {proceso.pid} terminado")
                 break
+            
+# REDIRECCIÓN DEL TEXTO
+class RedireccionTexto:
+    def __init__(self, widget, ventana):
+        self.widget = widget
+        self.ventana = ventana
+        
+    def write(self, texto):
+        def agregar():
+            self.widget.config(state='normal') 
+            self.widget.insert(tk.END, texto)
+            self.widget.see(tk.END)
+            self.widget.config(state='disabled')               
+        self.ventana.after(0, agregar)
+    def flush(self):
+        pass    
+            
