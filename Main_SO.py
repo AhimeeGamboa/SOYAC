@@ -64,4 +64,191 @@ class RedireccionTexto:
         self.ventana.after(0, agregar)
     def flush(self):
         pass    
-            
+
+# INTERFAZ GRÁFICA
+class InterfazSimuladorSO:
+
+    def __init__(self, ventana):
+
+        self.ventana = ventana
+        self.ventana.title("Simulador de Sistema Operativo")
+        self.ventana.geometry("800x600")
+
+        self.simulador_so = SistemaOperativo()
+        self.en_ejecucion = False
+
+        self.crear_componentes()
+        self.actualizar_lista_procesos()
+
+    # CREAR COMPONENTES
+    def crear_componentes(self):
+
+        marco_principal = ttk.Frame(self.ventana, padding=10)
+        marco_principal.pack(fill=tk.BOTH, expand=True)
+
+        # Título
+        titulo = ttk.Label(
+            marco_principal,
+            text="Gestión de Procesos",
+            font=("Helvetica", 16, "bold")
+        )
+        titulo.pack(pady=10)
+
+        # Botones
+        marco_botones = ttk.Frame(marco_principal)
+        marco_botones.pack(pady=10)
+
+        ttk.Button(
+            marco_botones,
+            text="Crear Proceso",
+            command=self.crear_proceso_gui
+        ).grid(row=0, column=0, padx=5)
+
+        self.boton_ejecutar = ttk.Button(
+            marco_botones,
+            text="Iniciar Simulación",
+            command=self.alternar_simulacion
+        )
+        self.boton_ejecutar.grid(row=0, column=1, padx=5)
+
+        ttk.Button(
+            marco_botones,
+            text="Ejecutar un Ciclo",
+            command=self.ejecutar_unidad_tiempo_gui
+        ).grid(row=0, column=2, padx=5)
+
+        ttk.Button(
+            marco_botones,
+            text="Eliminar Proceso",
+            command=self.eliminar_proceso_gui
+        ).grid(row=0, column=3, padx=5)
+
+        # Tabla de procesos
+        ttk.Label(
+            marco_principal,
+            text="Lista de Procesos",
+            font=("Helvetica", 12, "bold")
+        ).pack(pady=10)
+
+        self.tabla = ttk.Treeview(
+            marco_principal,
+            columns=("PID", "Nombre", "Estado", "Tiempo"),
+            show="headings"
+        )
+
+        self.tabla.heading("PID", text="PID")
+        self.tabla.heading("Nombre", text="Nombre")
+        self.tabla.heading("Estado", text="Estado")
+        self.tabla.heading("Tiempo", text="Tiempo Restante")
+
+        self.tabla.column("PID", width=60, anchor=tk.CENTER)
+        self.tabla.column("Nombre", width=200)
+        self.tabla.column("Estado", width=120, anchor=tk.CENTER)
+        self.tabla.column("Tiempo", width=120, anchor=tk.CENTER)
+
+        self.tabla.pack(fill=tk.BOTH, expand=True)
+
+        # Área de logs
+        ttk.Label(
+            marco_principal,
+            text="Log de Eventos",
+            font=("Helvetica", 12, "bold")
+        ).pack(pady=10)
+
+        self.texto_log = tk.Text(
+            marco_principal,
+            height=10,
+            state='disabled'
+        )
+
+        self.texto_log.pack(fill=tk.BOTH, expand=True)
+
+        # Redirigir print()
+        sys.stdout = RedireccionTexto(self.texto_log, self.ventana)
+
+    # CREAR PROCESO
+    def crear_proceso_gui(self):
+
+        nombre = simpledialog.askstring(
+            "Nuevo Proceso",
+            "Nombre del proceso:",
+            parent=self.ventana
+        )
+
+        if not nombre:
+            return
+
+        tiempo_rafaga = simpledialog.askstring(
+            "Tiempo de Ráfaga",
+            "Ingrese tiempo de ráfaga:",
+            parent=self.ventana
+        )
+
+        try:
+
+            tiempo_rafaga = int(tiempo_rafaga)
+
+            if tiempo_rafaga <= 0:
+                raise ValueError
+
+            self.simulador_so.crear_proceso(
+                nombre,
+                tiempo_rafaga
+            )
+
+            self.actualizar_lista_procesos()
+
+        except:
+            messagebox.showerror(
+                "Error",
+                "Ingrese un número entero positivo"
+            )
+
+    # ELIMINAR PROCESO
+    def eliminar_proceso_gui(self):
+
+        pid = simpledialog.askstring(
+            "Eliminar Proceso",
+            "Ingrese PID:",
+            parent=self.ventana
+        )
+
+        try:
+
+            pid = int(pid)
+
+            self.simulador_so.eliminar_proceso(pid)
+            self.actualizar_lista_procesos()
+
+        except:
+            messagebox.showerror(
+                "Error",
+                "PID inválido"
+            )
+
+    # EJECUTAR CICLO
+    def ejecutar_unidad_tiempo_gui(self):
+
+        self.simulador_so.ejecutar_unidad_tiempo()
+        self.actualizar_lista_procesos()
+
+    # ACTUALIZAR TABLA
+    def actualizar_lista_procesos(self):
+
+        # Limpiar tabla
+        for item in self.tabla.get_children():
+            self.tabla.delete(item)
+
+        # Insertar procesos
+        for proceso in self.simulador_so.procesos.values():
+
+            self.tabla.insert(
+                "",
+                tk.END,
+                values=(
+                    proceso.pid,
+                    proceso.nombre,
+                    proceso.estado,
+                    proceso.tiempo_restante
+                )
+            )
