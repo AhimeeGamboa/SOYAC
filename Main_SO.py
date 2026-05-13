@@ -15,7 +15,7 @@ class Proceso:
 #Clase sistema operativo
 class SistemaOperativo:
     def __init__(self):
-        self.peocesos = {}
+        self.procesos = {}
         self.siguiente_pid = 1
     
     def crear_proceso (self, nombre, tiempo_rafaga):
