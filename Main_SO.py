@@ -252,3 +252,42 @@ class InterfazSimuladorSO:
                     proceso.tiempo_restante
                 )
             )
+
+def alternar_simulacion(self):
+
+    self.en_ejecucion = not self.en_ejecucion
+
+    if self.en_ejecucion:
+
+        self.boton_ejecutar.config(
+            text_"Detener la simulacion"
+        )
+
+        threading.Thread(
+            target-self.ejecucion_automatica,
+            daemon=True
+        ).start()
+
+    else:
+
+        self.boton_ejecutar.config(
+            text="Iniciar Simulacion"
+        )
+def ejecucion_automatica(Self):
+
+    while self.en_ejecucion:
+
+        self.ventana.after(
+            0,
+            self.ejecutar_unidad_tiempo_gui
+        )
+        
+        time.sleep(1)
+
+if __name__ == "__main__":
+
+    raiz = tk.Tk()
+
+    app = InterfazSimuladorSO(raiz)
+
+    raiz.mainloop()
