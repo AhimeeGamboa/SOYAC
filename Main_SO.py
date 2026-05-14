@@ -253,37 +253,40 @@ class InterfazSimuladorSO:
                 )
             )
 
-def alternar_simulacion(self):
+    def alternar_simulacion(self):
 
-    self.en_ejecucion = not self.en_ejecucion
+        self.en_ejecucion = not self.en_ejecucion
 
-    if self.en_ejecucion:
+        if self.en_ejecucion:
 
-        self.boton_ejecutar.config(
-            text_"Detener la simulacion"
-        )
+            self.boton_ejecutar.config(
+                text="Detener Simulación"
+            )
 
-        threading.Thread(
-            target-self.ejecucion_automatica,
-            daemon=True
-        ).start()
+            threading.Thread(
+                target=self.ejecucion_automatica,
+                daemon=True
+            ).start()
 
-    else:
+        else:
 
-        self.boton_ejecutar.config(
-            text="Iniciar Simulacion"
-        )
-def ejecucion_automatica(Self):
+            self.boton_ejecutar.config(
+                text="Iniciar Simulación"
+            )
 
-    while self.en_ejecucion:
+    # EJECUCIÓN AUTOMÁTICA
+    def ejecucion_automatica(self):
 
-        self.ventana.after(
-            0,
-            self.ejecutar_unidad_tiempo_gui
-        )
-        
-        time.sleep(1)
+        while self.en_ejecucion:
 
+            self.ventana.after(
+                0,
+                self.ejecutar_unidad_tiempo_gui
+            )
+
+            time.sleep(1)
+
+# MAIN
 if __name__ == "__main__":
 
     raiz = tk.Tk()
